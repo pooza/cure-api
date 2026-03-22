@@ -6,6 +6,7 @@ After=network.target
 Type=simple
 User=__username__
 WorkingDirectory=/home/__username__/path/to/cure-api
+Environment=RACK_ENV=production
 ExecStart=/bin/bash -lc 'bundle exec bin/puma_daemon.rb start'
 ExecStop=/bin/kill -TERM $MAINPID
 TimeoutStopSec=15

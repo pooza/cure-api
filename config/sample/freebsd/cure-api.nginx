@@ -1,0 +1,36 @@
+server {
+  listen 80;
+  server_name cure-api.example.com;
+  return 301 https://$host$request_uri;
+}
+
+server {
+  listen 443 ssl;
+  server_name cure-api.example.com;
+
+  ssl_certificate /usr/local/etc/letsencrypt/live/cure-api.example.com/fullchain.pem;
+  ssl_certificate_key /usr/local/etc/letsencrypt/live/cure-api.example.com/privkey.pem;
+
+  location / {
+    proxy_pass http://127.0.0.1:3009;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+  }
+
+  location /.well-known/acme-challenge/ {
+    root /usr/local/www/acme;
+  }
+}
+
+# Optional: redirect from legacy URL
+# server {
+#   listen 443 ssl;
+#   server_name rubicure.example.com;
+#
+#   ssl_certificate /usr/local/etc/letsencrypt/live/rubicure.example.com/fullchain.pem;
+#   ssl_certificate_key /usr/local/etc/letsencrypt/live/rubicure.example.com/privkey.pem;
+#
+#   return 302 https://cure-api.example.com$request_uri;
+# }
