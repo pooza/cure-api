@@ -137,7 +137,7 @@ gas/
   girls/           # GAS ソース (clasp 管理)
   series/          # GAS ソース (clasp 管理)
 docs/
-  CLAUDE.md        # rubicure gem 脱却の設計メモ・データソース仕様
+  datasource-design.md  # rubicure gem 脱却の設計メモ・データソース仕様
 ```
 
 ## CI
