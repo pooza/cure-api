@@ -20,6 +20,11 @@
 | `main` | リリース済み安定版（デフォルト） |
 | `develop` | 開発ブランチ |
 
+## リリース戦略
+
+- マイルストーンは設けず、小さな修正が発生するたびにバージョンをバンプしてリリースする
+- `develop` で作業 → `main` にマージ → デプロイの流れ
+
 ## デプロイ環境
 
 ### 本番: キュアスタ！ (lbock.b-shock.co.jp)
@@ -149,6 +154,43 @@ GitHub Actions (`.github/workflows/test.yml`)。
 - **2026-03-08**: Broken pipe インシデント（モロヘイヤ統合時代、Open3.capture3 経由）→ 独立デーモン化で解消
 - **2026-03-20**: 本番初回デプロイ時に `tmp/cache/` 未存在で起動失敗 → `.gitkeep` 追加で対応済み
 - **2026-03-28**: VPS カーネル更新後の再起動で起動失敗 → rc.d に `redis` 依存追加で対応済み（monit が自動復旧していた）
+
+## セッション開始時の同期手順
+
+会話の最初に「進捗を同期してください」等の指示があった場合、以下の手順を実行する。
+
+### 1. プロジェクトガイドの読み込み
+
+- `.claude/CLAUDE.md` を読む（プロジェクトのルール・構造・履歴の正本）
+- `docs/datasource-design.md` — データソース仕様の詳細が必要な場合に参照
+
+### 2. リモートとの同期・状態確認
+
+- `git fetch origin` — **最初に必ず実行**。リモートが正本であり、ローカルの状態を信用しない
+- `git log HEAD..origin/main --oneline` — リモートに未取り込みのコミットがないか確認。差分があれば pull を検討
+- `git log --oneline -10` — 直近のコミット履歴
+- `gh issue list --state open` — open Issue 一覧
+- `gh pr list --state open` — open PR 一覧
+
+### 3. Dependabot セキュリティアラート
+
+- `gh api repos/pooza/cure-api/dependabot/alerts` で open アラートを確認
+- 0件なら対応不要、あれば提案
+
+### 4. 外部リポジトリの同期確認（chubo2）
+
+- `cd ~/repos/chubo2 && git fetch origin` + `git log HEAD..origin/main --oneline` でリモートとの差分を確認
+- `docs/infra-note.md` に cure-api 関連の変更があれば内容を確認
+
+### 5. 同期結果の報告
+
+- 現在のブランチ・状態、各確認項目の結果をまとめて報告する
+
+## 情報の記載先ルール
+
+- **課題・タスク** → GitHub Issue で管理（インフラ面の課題は `pooza/chubo2` の Issue として起票）
+- **プロジェクト共有すべき知見** → `.claude/CLAUDE.md` や `docs/` 配下など git 管理下のファイルに記載
+- **インフラ情報** → `pooza/chubo2` リポジトリの `docs/infra-note.md` に記載
 
 ## 関連プロジェクト・外部ドキュメント
 
