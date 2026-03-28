@@ -91,9 +91,8 @@ sudo service cure_api_puma restart
 
 ### rc.d と起動順序
 
-- rc.d スクリプトは `REQUIRE: LOGIN redis` で Redis 依存を宣言している
-- VPS 再起動時に Redis より先に起動すると失敗する（2026-03-28 障害で発覚、修正済み）
-- monit がプロセス不在を検知して自動復旧するが、rc.d の依存宣言が正しければ発生しない
+- rc.d スクリプトは `REQUIRE: LOGIN redis` を宣言しているが、cure-api 自体は Redis を使用していない（起動順序の遅延目的で残存しているだけ）
+- VPS 再起動直後はネットワークスタックが不安定な場合があり、GAS API への外向き HTTPS 接続が `Errno::EPIPE` で失敗することがある → HTTP クライアントのリトライロジック（v3.0.1、2026-03-28）で対策済み
 
 ### monit
 
@@ -153,7 +152,7 @@ GitHub Actions (`.github/workflows/test.yml`)。
 
 - **2026-03-08**: Broken pipe インシデント（モロヘイヤ統合時代、Open3.capture3 経由）→ 独立デーモン化で解消
 - **2026-03-20**: 本番初回デプロイ時に `tmp/cache/` 未存在で起動失敗 → `.gitkeep` 追加で対応済み
-- **2026-03-28**: VPS カーネル更新後の再起動で起動失敗 → rc.d に `redis` 依存追加で対応済み（monit が自動復旧していた）
+- **2026-03-28**: VPS カーネル更新後の再起動で GAS API 呼び出しが `Errno::EPIPE` で失敗。当初 rc.d に Redis 依存を追加したが的外れ（cure-api は Redis 不使用）。同日再発し、HTTP クライアントにリトライロジックを追加して根本対策
 
 ## 依存ライブラリに関する注意
 
