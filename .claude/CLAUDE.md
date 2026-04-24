@@ -1,0 +1,208 @@
+# cure-api 開発ガイド
+
+## プロジェクト概要
+
+プリキュア淑女録スプレッドシートにアクセスするための独立 API サーバー / CLI ツール。
+
+- **技術スタック**: Ruby / Sinatra (ginseng-web) / Puma
+- **データソース**: Google Spreadsheet → GAS (Google Apps Script) → JSON API
+- **リポジトリ**: `pooza/cure-api`（旧名 `mulukhiya-rubicure`、GitHub リネーム済み）
+- **現バージョン**: 3.0.1
+
+## 経緯
+
+もともとモロヘイヤ (`pooza/mulukhiya-toot-proxy`) に統合されていたが、Bundler 二重管理・`Open3.capture3` の不安定さ・Broken pipe インシデント (2026-03-08) を経て、v3.0.0 で独立デーモンに分離（モロヘイヤ #4144）。設計経緯の詳細はモロヘイヤ側の `docs/custom-api-redesign.md` を参照。
+
+## ブランチ戦略
+
+| ブランチ | 目的 |
+|---------|------|
+| `main` | リリース済み安定版（デフォルト） |
+| `develop` | 開発ブランチ |
+
+## リリース戦略
+
+- マイルストーンは設けず、小さな修正が発生するたびにバージョンをバンプしてリリースする
+- `develop` で作業 → `main` にマージ → デプロイの流れ
+
+## デプロイ環境
+
+### 本番: キュアスタ！ (lbock.b-shock.co.jp)
+
+| 項目 | 値 |
+|------|-----|
+| OS | FreeBSD 14.3-RELEASE |
+| Ruby | 3.3.10 (rbenv、モロヘイヤと共有) |
+| パス | `/home/pooza/repos/cure-api` |
+| シンボリックリンク | `~/repos/mulukhiya-rubicure` → `cure-api` |
+| ポート | 3009 |
+| ドメイン | `cure-api.precure.ml` (HTTPS, Let's Encrypt) |
+| SSH | `curesta_mulukhiya`（pooza ユーザー） |
+| rc.d | `/usr/local/etc/rc.d/cure_api_puma` |
+| monit | `/usr/local/etc/monit.d/cure-api` |
+| nginx | `/etc/nginx/servers/cure-api.precure.ml.conf` |
+
+rc.conf:
+```
+cure_api_enable="YES"
+cure_api_path="/home/pooza/repos/cure-api"
+cure_api_user="pooza"
+```
+
+### ステージング: dev22 (キュアスタ！ステージング)
+
+| 項目 | 値 |
+|------|-----|
+| パス | `/home/pooza/repos/mulukhiya-rubicure`（後日リネーム予定） |
+| ポート | 3009 |
+| ドメイン | `cure-api.st.precure.ml` |
+| SSH | `dev22_mulukhiya`（pooza ユーザー） |
+
+### 同居サービス
+
+同じサーバーでモロヘイヤ（ポート 3008）と Mastodon が稼働している。Ruby は rbenv で共有。
+
+## デプロイ手順
+
+### 本番
+
+```bash
+ssh curesta_mulukhiya
+cd ~/repos/cure-api
+sudo service monit stop          # monit 停止（HTTP 監視による誤検知防止）
+git pull origin main
+bundle install
+sudo service cure_api_puma restart
+sudo service monit start          # monit 再開
+curl -s http://localhost:3009/girls/index | head -1  # 動作確認
+```
+
+### ステージング
+
+```bash
+ssh dev22_mulukhiya
+cd ~/repos/mulukhiya-rubicure
+git pull origin main
+bundle install
+sudo service cure_api_puma restart
+```
+
+## 運用上の注意
+
+### rc.d と起動順序
+
+- rc.d スクリプトは `REQUIRE: LOGIN redis` を宣言しているが、cure-api 自体は Redis を使用していない（起動順序の遅延目的で残存しているだけ）
+- VPS 再起動直後はネットワークスタックが不安定な場合があり、GAS API への外向き HTTPS 接続が `Errno::EPIPE` で失敗することがある → HTTP クライアントのリトライロジック（v3.0.1、2026-03-28）で対策済み
+
+### monit
+
+- プロセスマッチング `"cure.api.*puma"` で監視
+- サービス再起動時は必ず `service monit stop` → 作業 → `service monit start` の手順を踏む
+- monit が動いたまま restart すると、stop → start の間にダウン検知→先行起動→「Already started!」エラーになる
+
+### FreeBSD rc.d の制約
+
+- rc.d スクリプトのファイル名にハイフン不可（`cure-api-puma` → `cure_api_puma`）
+
+## API エンドポイント
+
+| パス | 内容 | 形式 |
+|------|------|------|
+| `/` | エンドポイント一覧（HTML） | HTML |
+| `/girls` | すべてのプリキュア | JSON |
+| `/girls/index` | プリキュア名の一覧 | JSON |
+| `/girls/:name` | 指定したプリキュア | JSON |
+| `/girls/calendar` | プリキュアの誕生日カレンダー | iCalendar |
+| `/series` | すべてのシリーズ | JSON |
+| `/series/index` | シリーズ名の一覧 | JSON |
+| `/series/:name` | 指定したシリーズ | JSON |
+| `/cast/calendar` | キャストの誕生日カレンダー | iCalendar |
+
+## ディレクトリ構成
+
+```text
+app/lib/cure_api/
+  controller.rb    # Sinatra コントローラ（全エンドポイント）
+  puma_daemon.rb   # Ginseng::Daemon サブクラス（Puma 起動管理）
+  tool.rb          # 抽象 Tool 基底クラス
+  tool/            # Tool 実装 (GirlsTool, SeriesTool, CastTool 等)
+  datasource.rb    # GAS API からデータ取得・キャッシュ
+  girl.rb          # プリキュアデータラッパー
+  calendar/        # iCalendar 生成
+  config.rb        # 設定
+  http.rb          # HTTParty クライアント
+bin/
+  cure.rb          # CLI エントリポイント
+  puma_daemon.rb   # デーモンエントリポイント
+config/
+  application.yaml # メイン設定（GAS URL、Puma ポート等）
+  sample/          # rc.d / systemd / nginx / monit サンプル
+gas/
+  girls/           # GAS ソース (clasp 管理)
+  series/          # GAS ソース (clasp 管理)
+docs/
+  datasource-design.md  # rubicure gem 脱却の設計メモ・データソース仕様
+```
+
+## CI
+
+GitHub Actions (`.github/workflows/test.yml`)。
+
+## 既知の問題・障害履歴
+
+- **2026-03-08**: Broken pipe インシデント（モロヘイヤ統合時代、Open3.capture3 経由）→ 独立デーモン化で解消
+- **2026-03-20**: 本番初回デプロイ時に `tmp/cache/` 未存在で起動失敗 → `.gitkeep` 追加で対応済み
+- **2026-03-28**: VPS カーネル更新後の再起動で GAS API 呼び出しが `Errno::EPIPE` で失敗。当初 rc.d に Redis 依存を追加したが的外れ（cure-api は Redis 不使用）。同日再発し、HTTP クライアントにリトライロジックを追加して根本対策
+
+## 依存ライブラリに関する注意
+
+### rack / sinatra のアップグレードは慎重に
+
+モロヘイヤで rack 3.2 + sinatra 4.2 の組み合わせにより**異なるアカウントの投稿として送信される**致命的な問題が発生した（2025-10-26、`pooza/mulukhiya-toot-proxy` の `docs/postmortem-2025-10-rack32.md` 参照）。cure-api には投稿機能はないが、設計がモロヘイヤのサブセットであるため、rack / sinatra のメジャー・マイナーアップグレードはモロヘイヤ側での検証を待ってから行うこと。
+
+現在の安全な組み合わせ: rack 3.1.x + sinatra 4.1.x
+
+## セッション開始時の同期手順
+
+会話の最初に「進捗を同期してください」等の指示があった場合、以下の手順を実行する。
+
+### 1. プロジェクトガイドの読み込み
+
+- `.claude/CLAUDE.md` を読む（プロジェクトのルール・構造・履歴の正本）
+- `docs/datasource-design.md` — データソース仕様の詳細が必要な場合に参照
+
+### 2. リモートとの同期・状態確認
+
+- `git fetch origin` — **最初に必ず実行**。リモートが正本であり、ローカルの状態を信用しない
+- `git log HEAD..origin/main --oneline` — リモートに未取り込みのコミットがないか確認。差分があれば pull を検討
+- `git log --oneline -10` — 直近のコミット履歴
+- `gh issue list --state open` — open Issue 一覧
+- `gh pr list --state open` — open PR 一覧
+
+### 3. Dependabot セキュリティアラート
+
+- `gh api repos/pooza/cure-api/dependabot/alerts` で open アラートを確認
+- 0件なら対応不要、あれば提案
+
+### 4. 外部リポジトリの同期確認（chubo2）
+
+- `cd ~/repos/chubo2 && git fetch origin` + `git log HEAD..origin/main --oneline` でリモートとの差分を確認
+- `docs/infra-note.md` に cure-api 関連の変更があれば内容を確認
+
+### 5. 同期結果の報告
+
+- 現在のブランチ・状態、各確認項目の結果をまとめて報告する
+
+## 情報の記載先ルール
+
+- **課題・タスク** → GitHub Issue で管理（インフラ面の課題は `pooza/chubo2` の Issue として起票）
+- **プロジェクト共有すべき知見** → `.claude/CLAUDE.md` や `docs/` 配下など git 管理下のファイルに記載
+- **インフラ情報** → `pooza/chubo2` リポジトリの `docs/infra-note.md` に記載
+
+## 関連プロジェクト・外部ドキュメント
+
+- **モロヘイヤ** (`pooza/mulukhiya-toot-proxy`): 元の統合先。カスタム API 機能は 5.9.0 で削除済み。分離の設計経緯は `docs/custom-api-redesign.md` にある
+- **キュアスタ！**: cure-api の唯一の利用インスタンス
+- **インフラノート** (`pooza/chubo2` の `docs/infra-note.md`): サーバー構成・デプロイ履歴の正本。cure-api に関連するセクション:
+  - 「cure-api ステージングデプロイ (2026-03-19)」— dev22 への初回デプロイ記録・判明した問題
+  - 「cure-api 本番デプロイ (2026-03-20)」— lbock への v3.0.0 デプロイ記録・nginx/monit/rc.d 設定の詳細
