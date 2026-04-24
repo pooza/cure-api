@@ -6,7 +6,7 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/cure-api
-  version: 3.0.1
+  version: 3.0.2
 gas:
   girls:
     url: https://script.google.com/macros/s/AKfycbyz2apomjlyawkhLI-XvZveeEPVvLXmGzshHiE9mfsZT8DOOKAwKRQ_CxzfBiv7Qki33A/exec
