@@ -9,7 +9,7 @@ module CureAPI
     end
 
     def self.type
-      env = ENV['RACK_ENV']
+      env = ENV.fetch('RACK_ENV', nil)
       return env.to_sym if env && !env.empty?
       return super
     end
