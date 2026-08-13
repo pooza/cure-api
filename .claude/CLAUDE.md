@@ -7,7 +7,7 @@
 - **技術スタック**: Ruby / Sinatra (ginseng-web) / Puma
 - **データソース**: Google Spreadsheet → GAS (Google Apps Script) → JSON API
 - **リポジトリ**: `pooza/cure-api`（旧名 `mulukhiya-rubicure`、GitHub リネーム済み）
-- **現バージョン**: 3.0.1
+- **現バージョン**: 3.1.0
 
 ## 経緯
 
@@ -27,36 +27,32 @@
 
 ## デプロイ環境
 
-### 本番: キュアスタ！ (lbock.b-shock.co.jp)
+⚠ **2026-07-28 にキュアスタ！が lbock（さくら VPS）から gomander（Linode）へ移行した。**
+旧 lbock は 07-29 に停止済み。⚠ **ステージングも dev22 から dev25 に変わっている**（dev22 は名前解決もできない）。
+⚠⚠ **着地ユーザーが `pooza` から `mastodon` に変わった**（SNS・モロヘイヤ・cure-api の 3 つが `~mastodon/repos/` に並ぶ）。
+正本は `pooza/chubo2` の `docs/infra-note.md`。
+
+### 本番: キュアスタ！ (gomander.b-shock.co.jp)
 
 | 項目 | 値 |
 |------|-----|
-| OS | FreeBSD 14.3-RELEASE |
-| Ruby | 3.3.10 (rbenv、モロヘイヤと共有) |
-| パス | `/home/pooza/repos/cure-api` |
-| シンボリックリンク | `~/repos/mulukhiya-rubicure` → `cure-api` |
+| OS | FreeBSD 15（ネットインストーラ導入。持ち込みイメージ由来ではない） |
+| Ruby | rbenv（モロヘイヤと共有） |
+| パス | `/home/mastodon/repos/cure-api` |
 | ポート | 3009 |
 | ドメイン | `cure-api.precure.ml` (HTTPS, Let's Encrypt) |
-| SSH | `curesta_mulukhiya`（pooza ユーザー） |
+| SSH | `gomander.b-shock.co.jp`（mastodon ユーザー） |
 | rc.d | `/usr/local/etc/rc.d/cure_api_puma` |
 | monit | `/usr/local/etc/monit.d/cure-api` |
-| nginx | `/etc/nginx/servers/cure-api.precure.ml.conf` |
 
-rc.conf:
-```
-cure_api_enable="YES"
-cure_api_path="/home/pooza/repos/cure-api"
-cure_api_user="pooza"
-```
-
-### ステージング: dev22 (キュアスタ！ステージング)
+### ステージング: dev25 (キュアスタ！ステージング)
 
 | 項目 | 値 |
 |------|-----|
-| パス | `/home/pooza/repos/mulukhiya-rubicure`（後日リネーム予定） |
+| パス | `/home/mastodon/repos/cure-api` |
 | ポート | 3009 |
 | ドメイン | `cure-api.st.precure.ml` |
-| SSH | `dev22_mulukhiya`（pooza ユーザー） |
+| SSH | `dev25.b-shock.local`（pooza ユーザーで入り、`mastodon` へ sudo） |
 
 ### 同居サービス
 
@@ -67,7 +63,7 @@ cure_api_user="pooza"
 ### 本番
 
 ```bash
-ssh curesta_mulukhiya
+ssh gomander.b-shock.co.jp
 cd ~/repos/cure-api
 sudo service monit stop          # monit 停止（HTTP 監視による誤検知防止）
 git pull origin main
@@ -80,8 +76,8 @@ curl -s http://localhost:3009/girls/index | head -1  # 動作確認
 ### ステージング
 
 ```bash
-ssh dev22_mulukhiya
-cd ~/repos/mulukhiya-rubicure
+ssh dev25.b-shock.local
+cd ~mastodon/repos/cure-api
 git pull origin main
 bundle install
 sudo service cure_api_puma restart
@@ -116,6 +112,9 @@ sudo service cure_api_puma restart
 | `/series` | すべてのシリーズ | JSON |
 | `/series/index` | シリーズ名の一覧 | JSON |
 | `/series/:name` | 指定したシリーズ | JSON |
+| `/singers` | すべてのプリキュア歌手 | JSON |
+| `/singers/index` | プリキュア歌手名の一覧 | JSON |
+| `/singers/:name` | 指定した歌手 | JSON |
 | `/cast/calendar` | キャストの誕生日カレンダー | iCalendar |
 
 ## ディレクトリ構成
@@ -140,6 +139,7 @@ config/
 gas/
   girls/           # GAS ソース (clasp 管理)
   series/          # GAS ソース (clasp 管理)
+  singers/         # GAS ソース (clasp 管理)
 docs/
   datasource-design.md  # rubicure gem 脱却の設計メモ・データソース仕様
 ```
@@ -156,11 +156,25 @@ GitHub Actions (`.github/workflows/test.yml`)。
 
 ## 依存ライブラリに関する注意
 
-### rack / sinatra のアップグレードは慎重に
+### rack / sinatra のアップグレード → ✅ 解禁（2026-08-13）
 
-モロヘイヤで rack 3.2 + sinatra 4.2 の組み合わせにより**異なるアカウントの投稿として送信される**致命的な問題が発生した（2025-10-26、`pooza/mulukhiya-toot-proxy` の `docs/postmortem-2025-10-rack32.md` 参照）。cure-api には投稿機能はないが、設計がモロヘイヤのサブセットであるため、rack / sinatra のメジャー・マイナーアップグレードはモロヘイヤ側での検証を待ってから行うこと。
+モロヘイヤで rack 3.2 + sinatra 4.2 の組み合わせにより**異なるアカウントの投稿として送信される**致命的な問題が発生した（2025-10-26、`pooza/mulukhiya-toot-proxy` の `docs/postmortem-2025-10-rack32.md` 参照）。この記述は長らく「モロヘイヤ側での検証を待つ」「安全な組み合わせは rack 3.1.x + sinatra 4.1.x」としていたが、**2 点とも実態と合わなくなっていた。**
 
-現在の安全な組み合わせ: rack 3.1.x + sinatra 4.1.x
+- ✅ **待つ条件は満たされた。**sinatra 4.2.1 はモロヘイヤ **v5.33.0** に入っており（`e055d27f`）、**本番 4 台にデプロイ済み**（`pooza/chubo2` の作業履歴）。モロヘイヤの現在の組み合わせは **rack 3.2.6 + sinatra 4.2.1**
+- ⚠ **「安全な組み合わせ」の記述はドリフトしていた。**cure-api の lockfile は**この記述より前から rack 3.2.6** になっていた（sinatra だけが 4.1.1 で止まっていた）。⚠ **守っているつもりで、実際には片方しか守れていない状態だった**
+
+#### ⚠⚠ 本当の判定基準は「リクエスト単位の同一性を持つか」
+
+**バージョンの組み合わせではなく、事故が宿る場所で判断する。**あの事故は「**誰のリクエストか**」がリクエストをまたいで混ざったもので、**それを持たないアプリには起こりようがない。**
+
+| | セッション / Cookie | リクエスト単位の資格情報 | 影響 |
+| --- | --- | --- | --- |
+| モロヘイヤ | ⚠ **あり**（`Rack::Session::Cookie`） | ⚠ **あり**（アカウントごとのトークンで投稿） | 事故が起きた |
+| **cure-api** | ✅ **無し**（grep で 0 件） | ✅ **無し**（認証を持たない公開 API・読み取り専用） | ⚠ **構造的に起こらない** |
+
+⚠⚠ **cure-api がリクエスト単位の同一性を持たないのは、たまたまではなく方針。**⚠ **セッション・認証を必要とする機能は、そもそも実装しない**（cure-api は**認証を持たない公開 API** として運用する。この前提は `pooza/makoto2` 側の設計方針にも「cure-api に認証を足す前提の設計をしない」「非公開のものは cure-api の外に置く」として書かれている）。
+
+✅ **したがって条件付きの保留ではなく解除でよい。rack / sinatra は通常の依存として扱う。**⚠ **この判断が効かなくなるのは「認証を持たない公開 API」という方針そのものを見直すときだけ**で、そのときは依存の話ではなく方針の話として扱う。
 
 ## セッション開始時の同期手順
 
@@ -201,6 +215,7 @@ GitHub Actions (`.github/workflows/test.yml`)。
 
 ## 関連プロジェクト・外部ドキュメント
 
+- **MAKOTO** (`pooza/makoto2`): `/singers` の利用者。バースデーライブ（#13）のゲストコーナーで出すカバーを「プリキュア歌手の持ち歌」に限るために引く。⚠ **MAKOTO 側にプリキュアの情報を抱え込まない**方針なので、足りない情報は cure-api を伸ばす
 - **モロヘイヤ** (`pooza/mulukhiya-toot-proxy`): 元の統合先。カスタム API 機能は 5.9.0 で削除済み。分離の設計経緯は `docs/custom-api-redesign.md` にある
 - **キュアスタ！**: cure-api の唯一の利用インスタンス
 - **インフラノート** (`pooza/chubo2` の `docs/infra-note.md`): サーバー構成・デプロイ履歴の正本。cure-api に関連するセクション:

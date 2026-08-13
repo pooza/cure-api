@@ -6,14 +6,15 @@ rubicureライブラリはRubyの実装としての正しさを追求してい�
 
 ## データソース
 
-- girlsとseriesで別々のGoogle Spreadsheetを使用
+- girls / series / singers でそれぞれ別のGoogle Spreadsheetを使用
   - [girls用スプレッドシート](https://docs.google.com/spreadsheets/d/1Tba5B-l2zwLkYs-SRhI_whKHNY86CYmlIp_Xu6WPILk/edit)
   - [series用スプレッドシート](https://docs.google.com/spreadsheets/d/1BLJXOFMqayF75-sVLJY56XwnNhmyck_RGRLWKm3wXB4/edit)
+  - [singers用スプレッドシート（プリキュア歌手辞書）](https://docs.google.com/spreadsheets/d/1ZAtmhHN5mTsmRUB5yekBDEHC6G5fw8vWvCp14vkSNB8/edit)
 - GAS (Google Apps Script) でJSON APIとして公開
-- GASのコードは `gas/girls/`, `gas/series/` で管理し、claspでデプロイ
+- GASのコードは `gas/girls/`, `gas/series/`, `gas/singers/` で管理し、claspでデプロイ
 - Rakeタスクでpush/deployが可能:
-  - `rake clasp:girls:push` / `rake clasp:series:push` — コードをpush
-  - `rake clasp:girls:deploy` / `rake clasp:series:deploy` — push後にdeploy
+  - `rake clasp:girls:push` / `rake clasp:series:push` / `rake clasp:singers:push` — コードをpush
+  - `rake clasp:girls:deploy` / `rake clasp:series:deploy` / `rake clasp:singers:deploy` — push後にdeploy
 
 ## スプレッドシート構成
 
@@ -40,6 +41,17 @@ rubicureライブラリはRubyの実装としての正しさを追求してい�
 | `related_series` | 関連シリーズ (カンマ区切り) | aliasesのみ |
 | `key` | 識別キー (例: `dokidoki`) | o |
 
+### singersスプレッドシート（プリキュア歌手辞書）
+
+| カラム | 内容 |
+|---|---|
+| `name` | 歌手・グループ名 (例: 宮本 佳那子) |
+| `members` | グループの構成員 (カンマ区切り。ソロ名義は空) |
+
+⚠ **`key` 列を持たない。**識別子は `name` そのもの（人名に機械的なキーを振る意味が薄く、スプレッドシートの列を増やすことになるため）。
+
+⚠⚠ **表記の揺れは `Datasource.normalize_name` が吸収する。**スプレッドシートは「宮本 佳那子」のように姓名の間に空白を持つが、iTunes 由来の曲データの名義は「宮本佳那子」。NFKC 正規化して空白を落として比較する。**利用側でそれぞれ正規化を書かせない。**
+
 ## GAS APIエンドポイント
 
 ### girls (`gas/girls/`)
@@ -51,6 +63,25 @@ rubicureライブラリはRubyの実装としての正しさを追求してい�
 
 - `?action=series` — 全シリーズデータ (JSON配列、`key`と`series`のみ)
 - パラメータなし — ニックネーム/関連シリーズのマッピング (既存互換)
+
+### singers (`gas/singers/`)
+
+- `?action=singers`（既定） — 全歌手データ (JSON配列、`name` と `members`)
+- `?action=index` — 歌手名の配列
+
+## 新しいスプレッドシートを足すとき
+
+⚠ **GAS プロジェクトの作成とデプロイは Google アカウントの操作なので、リポジトリ側だけでは完結しない。**
+
+1. `gas/{name}/` に `main.gs` / `appsscript.json` / `.clasp.json` を置く
+2. ⚠ **対象のスプレッドシートを開き、拡張機能 → Apps Script でコンテナバインドのプロジェクトを作る**（スタンドアロンだと `SpreadsheetApp.getActiveSpreadsheet()` が nil になる）
+3. そのプロジェクトの **スクリプト ID** を `gas/{name}/.clasp.json` の `scriptId` に書く
+4. `rake clasp:{name}:push` → `rake clasp:{name}:deploy`
+   - ⚠ deploy タスクが `config/application.yaml` の `/gas/{name}/url` を自動で書き換える
+5. `app/task/clasp.rb` の対象リストに `{name}` を足す
+6. `Datasource#fetch_{name}` / `{Name}Tool` / `Controller` のルート / `config` の `tools` を足す
+
+⚠ **デプロイのアクセス設定は `ANYONE_ANONYMOUS`**（`appsscript.json`）。cure-api は認証を持たない公開 API なので、GAS 側も匿名アクセスで揃える。
 
 ## Ruby側の構成
 

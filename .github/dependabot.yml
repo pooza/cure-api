@@ -7,5 +7,20 @@ updates:
     time: '03:00'
     timezone: 'Asia/Tokyo'
   open-pull-requests-limit: 10
-  target-branch: master
+  # ⚠⚠ 旧設定は `master` を指していたが、このリポジトリに master は無い（既定は main）。
+  # ⚠ 存在しないブランチを指しても Dependabot は既定ブランチに出すので、
+  # **設定が間違っていることが PR の存在からは分からない**まま放置されていた。
+  #
+  # ⚠ `develop` に出す。ブランチ戦略が「develop で作業 → main にマージ」なので、
+  # main へ直接出すと develop が古いままになり、次のマージで lockfile が巻き戻る。
+  target-branch: develop
   versioning-strategy: lockfile-only
+# GitHub Actions の更新も受ける。⚠ actions/checkout が v3 のまま 2 年以上放置されていた
+# （Node 16 ランナーは既にサポート外）。バージョン更新を人手で追わない。
+- package-ecosystem: github-actions
+  directory: '/'
+  schedule:
+    interval: weekly
+    time: '03:00'
+    timezone: 'Asia/Tokyo'
+  target-branch: develop

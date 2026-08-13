@@ -10,8 +10,10 @@ group :development do
   gem 'rubocop'
   gem 'rubocop-minitest'
   gem 'rubocop-performance'
+  gem 'rack-test'
   gem 'rubocop-rake'
   gem 'test-unit'
   gem 'timecop'
+  gem 'webmock'
 end
 
