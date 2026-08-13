@@ -4,7 +4,7 @@ module CureAPI
   namespace :bundle do
     desc 'install gems'
     task :install do
-      sh 'gem install bundler -v "~>2.0"'
+      sh 'gem install bundler -v "~>4.0"'
       sh 'bundle install --jobs 4 --retry 3'
     end
 
