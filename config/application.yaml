@@ -14,7 +14,7 @@ gas:
   # （Datasource が「GAS が未デプロイ」と言って落ちる）。
   # デプロイ手順は docs/datasource-design.md
   singers:
-    url: REPLACE_ME_AFTER_CLASP_DEPLOY
+    url: https://script.google.com/macros/s/AKfycbyIAUFf0BqmO2xAMQYCC-hZf4Nn8uxgjcqv41xvkv08GPBINbg3Iysc-PoKe9MHKdN4/exec
   series:
     url: https://script.google.com/macros/s/AKfycbxdqh2CNk71V4-5vsiQ0ruEzF9Eu79pzDFyJiQa_GjgSYk9yCTrSo2lGi0wkiGsX_fU/exec
 http:
