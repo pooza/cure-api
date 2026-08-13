@@ -50,9 +50,29 @@ module CureAPI
       @renderer = Ginseng::Web::JSONRenderer.new
     end
 
+    # ⚠⚠ **ルートに当たらなかったときに 200 を返さない。**`@renderer.status` の既定は
+    # 200 なので、素通しにすると **Sinatra の 404 を 200 で上書きしてしまう**
+    # （`/nonexistent` が「HTTP 200 ＋ `<h1>Not Found</h1>`」で返っていた）。
+    #
+    # ⚠ **利用側はステータスでしか失敗を判定できない。**実際に `pooza/makoto2` の
+    # ゲストコーナーが、未実装の `/singers` の 200 を成功と受け取り、HTML を JSON として
+    # 扱って**黙って 0 件**になった（2026-08-13）。
     after do
       content_type(@renderer.type) unless @raw_response
+      # ルートが無ければ Sinatra が立てた 404 をそのまま通す。
+      next if response.status == 404 && @renderer.status == 200
       status @renderer.status
+    end
+
+    # ⚠ **`not_found` ではなく `Sinatra::NotFound`。**前者は 404 全般に効くので、
+    # `/girls/zzz` のように**ハンドラが自分で 404 を立てた応答の本文まで潰す**
+    # （固有のメッセージが消えて原因が分からなくなる）。ここで拾いたいのは
+    # **ルートに 1 つも当たらなかった場合だけ。**
+    error Sinatra::NotFound do
+      @raw_response = true
+      content_type('application/json; charset=UTF-8')
+      status 404
+      return {error: "'#{request.path_info}' not found"}.to_json
     end
 
     get '/' do
