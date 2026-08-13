@@ -27,36 +27,32 @@
 
 ## デプロイ環境
 
-### 本番: キュアスタ！ (lbock.b-shock.co.jp)
+⚠ **2026-07-28 にキュアスタ！が lbock（さくら VPS）から gomander（Linode）へ移行した。**
+旧 lbock は 07-29 に停止済み。⚠ **ステージングも dev22 から dev25 に変わっている**（dev22 は名前解決もできない）。
+⚠⚠ **着地ユーザーが `pooza` から `mastodon` に変わった**（SNS・モロヘイヤ・cure-api の 3 つが `~mastodon/repos/` に並ぶ）。
+正本は `pooza/chubo2` の `docs/infra-note.md`。
+
+### 本番: キュアスタ！ (gomander.b-shock.co.jp)
 
 | 項目 | 値 |
 |------|-----|
-| OS | FreeBSD 14.3-RELEASE |
-| Ruby | 3.3.10 (rbenv、モロヘイヤと共有) |
-| パス | `/home/pooza/repos/cure-api` |
-| シンボリックリンク | `~/repos/mulukhiya-rubicure` → `cure-api` |
+| OS | FreeBSD 15（ネットインストーラ導入。持ち込みイメージ由来ではない） |
+| Ruby | rbenv（モロヘイヤと共有） |
+| パス | `/home/mastodon/repos/cure-api` |
 | ポート | 3009 |
 | ドメイン | `cure-api.precure.ml` (HTTPS, Let's Encrypt) |
-| SSH | `curesta_mulukhiya`（pooza ユーザー） |
+| SSH | `gomander.b-shock.co.jp`（mastodon ユーザー） |
 | rc.d | `/usr/local/etc/rc.d/cure_api_puma` |
 | monit | `/usr/local/etc/monit.d/cure-api` |
-| nginx | `/etc/nginx/servers/cure-api.precure.ml.conf` |
 
-rc.conf:
-```
-cure_api_enable="YES"
-cure_api_path="/home/pooza/repos/cure-api"
-cure_api_user="pooza"
-```
-
-### ステージング: dev22 (キュアスタ！ステージング)
+### ステージング: dev25 (キュアスタ！ステージング)
 
 | 項目 | 値 |
 |------|-----|
-| パス | `/home/pooza/repos/mulukhiya-rubicure`（後日リネーム予定） |
+| パス | `/home/mastodon/repos/cure-api` |
 | ポート | 3009 |
 | ドメイン | `cure-api.st.precure.ml` |
-| SSH | `dev22_mulukhiya`（pooza ユーザー） |
+| SSH | `dev25.b-shock.local`（pooza ユーザーで入り、`mastodon` へ sudo） |
 
 ### 同居サービス
 
@@ -67,7 +63,7 @@ cure_api_user="pooza"
 ### 本番
 
 ```bash
-ssh curesta_mulukhiya
+ssh gomander.b-shock.co.jp
 cd ~/repos/cure-api
 sudo service monit stop          # monit 停止（HTTP 監視による誤検知防止）
 git pull origin main
@@ -80,8 +76,8 @@ curl -s http://localhost:3009/girls/index | head -1  # 動作確認
 ### ステージング
 
 ```bash
-ssh dev22_mulukhiya
-cd ~/repos/mulukhiya-rubicure
+ssh dev25.b-shock.local
+cd ~mastodon/repos/cure-api
 git pull origin main
 bundle install
 sudo service cure_api_puma restart
