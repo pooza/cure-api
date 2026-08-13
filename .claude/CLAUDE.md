@@ -7,7 +7,7 @@
 - **技術スタック**: Ruby / Sinatra (ginseng-web) / Puma
 - **データソース**: Google Spreadsheet → GAS (Google Apps Script) → JSON API
 - **リポジトリ**: `pooza/cure-api`（旧名 `mulukhiya-rubicure`、GitHub リネーム済み）
-- **現バージョン**: 3.1.2
+- **現バージョン**: 3.1.3
 
 ## 経緯
 
@@ -51,7 +51,7 @@
 |------|-----|
 | パス | `/home/mastodon/repos/cure-api` |
 | ポート | 3009 |
-| ドメイン | `cure-api.st.precure.ml` |
+| ドメイン | `cure-api.st2.precure.ml` |
 | SSH | `dev25.b-shock.local`（pooza ユーザーで入り、`mastodon` へ sudo） |
 
 ### 同居サービス
