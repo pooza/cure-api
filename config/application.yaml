@@ -6,10 +6,15 @@ package:
     - tkoishi@b-shock.co.jp
   license: MIT
   url: https://github.com/pooza/cure-api
-  version: 3.0.3
+  version: 3.1.0
 gas:
   girls:
     url: https://script.google.com/macros/s/AKfycbyz2apomjlyawkhLI-XvZveeEPVvLXmGzshHiE9mfsZT8DOOKAwKRQ_CxzfBiv7Qki33A/exec
+  # プリキュア歌手辞書。⚠ 未デプロイの間は REPLACE_ME のまま
+  # （Datasource が「GAS が未デプロイ」と言って落ちる）。
+  # デプロイ手順は docs/datasource-design.md
+  singers:
+    url: REPLACE_ME_AFTER_CLASP_DEPLOY
   series:
     url: https://script.google.com/macros/s/AKfycbxdqh2CNk71V4-5vsiQ0ruEzF9Eu79pzDFyJiQa_GjgSYk9yCTrSo2lGi0wkiGsX_fU/exec
 http:
@@ -25,5 +30,6 @@ puma:
 tools:
   - girls
   - series
+  - singers
   - cast
   - help

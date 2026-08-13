@@ -7,7 +7,7 @@
 - **技術スタック**: Ruby / Sinatra (ginseng-web) / Puma
 - **データソース**: Google Spreadsheet → GAS (Google Apps Script) → JSON API
 - **リポジトリ**: `pooza/cure-api`（旧名 `mulukhiya-rubicure`、GitHub リネーム済み）
-- **現バージョン**: 3.0.1
+- **現バージョン**: 3.1.0
 
 ## 経緯
 
@@ -116,6 +116,9 @@ sudo service cure_api_puma restart
 | `/series` | すべてのシリーズ | JSON |
 | `/series/index` | シリーズ名の一覧 | JSON |
 | `/series/:name` | 指定したシリーズ | JSON |
+| `/singers` | すべてのプリキュア歌手 | JSON |
+| `/singers/index` | プリキュア歌手名の一覧 | JSON |
+| `/singers/:name` | 指定した歌手 | JSON |
 | `/cast/calendar` | キャストの誕生日カレンダー | iCalendar |
 
 ## ディレクトリ構成
@@ -140,6 +143,7 @@ config/
 gas/
   girls/           # GAS ソース (clasp 管理)
   series/          # GAS ソース (clasp 管理)
+  singers/         # GAS ソース (clasp 管理)
 docs/
   datasource-design.md  # rubicure gem 脱却の設計メモ・データソース仕様
 ```
@@ -215,6 +219,7 @@ GitHub Actions (`.github/workflows/test.yml`)。
 
 ## 関連プロジェクト・外部ドキュメント
 
+- **MAKOTO** (`pooza/makoto2`): `/singers` の利用者。バースデーライブ（#13）のゲストコーナーで出すカバーを「プリキュア歌手の持ち歌」に限るために引く。⚠ **MAKOTO 側にプリキュアの情報を抱え込まない**方針なので、足りない情報は cure-api を伸ばす
 - **モロヘイヤ** (`pooza/mulukhiya-toot-proxy`): 元の統合先。カスタム API 機能は 5.9.0 で削除済み。分離の設計経緯は `docs/custom-api-redesign.md` にある
 - **キュアスタ！**: cure-api の唯一の利用インスタンス
 - **インフラノート** (`pooza/chubo2` の `docs/infra-note.md`): サーバー構成・デプロイ履歴の正本。cure-api に関連するセクション:

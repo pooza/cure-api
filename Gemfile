@@ -13,5 +13,6 @@ group :development do
   gem 'rubocop-rake'
   gem 'test-unit'
   gem 'timecop'
+  gem 'webmock'
 end
 

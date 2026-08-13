@@ -10,6 +10,9 @@ module CureAPI
       {path: '/series', description: 'すべてのシリーズ (JSON)'},
       {path: '/series/index', description: 'シリーズ名の一覧 (JSON)'},
       {path: '/series/:name', description: '指定したシリーズ (JSON)', example: '/series/dokidoki'},
+      {path: '/singers', description: 'すべてのプリキュア歌手 (JSON)'},
+      {path: '/singers/index', description: 'プリキュア歌手名の一覧 (JSON)'},
+      {path: '/singers/:name', description: '指定した歌手 (JSON)', example: '/singers/宮本佳那子'},
       {path: '/cast/calendar', description: 'キャストの誕生日カレンダー (iCalendar)'},
     ].freeze
 
@@ -102,6 +105,30 @@ module CureAPI
     get '/series/:name' do
       tool = Tool.create('series')
       @renderer.message = tool.series(params[:name])
+      return @renderer.to_s
+    rescue Ginseng::NotFoundError => e
+      @renderer.status = 404
+      @renderer.message = {error: e.message}
+      return @renderer.to_s
+    end
+
+    get '/singers' do
+      tool = Tool.create('singers')
+      @renderer.message = tool.all
+      return @renderer.to_s
+    end
+
+    get '/singers/index' do
+      tool = Tool.create('singers')
+      @renderer.message = tool.index
+      return @renderer.to_s
+    end
+
+    # ⚠ `/singers/index` より後に置かない。Sinatra は先に書いたルートが勝つので、
+    # 逆にすると `index` という名前の歌手を探しに行く。
+    get '/singers/:name' do
+      tool = Tool.create('singers')
+      @renderer.message = tool.singer(params[:name])
       return @renderer.to_s
     rescue Ginseng::NotFoundError => e
       @renderer.status = 404

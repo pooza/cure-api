@@ -3,7 +3,7 @@ module CureAPI
   extend Rake::DSL
 
   namespace :clasp do
-    ['girls', 'series'].each do |name|
+    ['girls', 'series', 'singers'].each do |name|
       namespace name do
         gas_dir = File.join(dir, 'gas', name)
 
