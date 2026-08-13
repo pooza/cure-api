@@ -7,7 +7,7 @@
 - **技術スタック**: Ruby / Sinatra (ginseng-web) / Puma
 - **データソース**: Google Spreadsheet → GAS (Google Apps Script) → JSON API
 - **リポジトリ**: `pooza/cure-api`（旧名 `mulukhiya-rubicure`、GitHub リネーム済み）
-- **現バージョン**: 3.1.1
+- **現バージョン**: 3.1.2
 
 ## 経緯
 
