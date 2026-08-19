@@ -6,12 +6,9 @@ gem 'icalendar'
 gem 'puma'
 
 group :development do
+  gem 'ginseng-style', github: 'pooza/ginseng-style', branch: 'main', require: false
   gem 'ricecream'
-  gem 'rubocop'
-  gem 'rubocop-minitest'
-  gem 'rubocop-performance'
   gem 'rack-test'
-  gem 'rubocop-rake'
   gem 'test-unit'
   gem 'timecop'
   gem 'webmock'
