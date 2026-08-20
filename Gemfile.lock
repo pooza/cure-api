@@ -33,6 +33,17 @@ GIT
       zlib
 
 GIT
+  remote: https://github.com/pooza/ginseng-style.git
+  revision: 2474936f5598640c9cf8464f71195c2bb03e4309
+  branch: main
+  specs:
+    ginseng-style (1.0.0)
+      rubocop
+      rubocop-minitest
+      rubocop-performance
+      rubocop-rake
+
+GIT
   remote: https://github.com/pooza/ginseng-web.git
   revision: 7f0afdc237786e96e7f847e052bb76246a317bf2
   branch: main
@@ -243,15 +254,12 @@ PLATFORMS
 
 DEPENDENCIES
   ginseng-core!
+  ginseng-style!
   ginseng-web!
   icalendar
   puma
   rack-test
   ricecream
-  rubocop
-  rubocop-minitest
-  rubocop-performance
-  rubocop-rake
   test-unit
   timecop
   webmock

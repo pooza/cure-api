@@ -207,6 +207,21 @@ GitHub Actions (`.github/workflows/test.yml`)。
 
 - 現在のブランチ・状態、各確認項目の結果をまとめて報告する
 
+## 規約（コーディング・運用・表記）
+
+⚠ **正本は [pooza/ginseng-style](https://github.com/pooza/ginseng-style)。** ここに書き写さないこと。
+
+| ドキュメント | 内容 |
+| --- | --- |
+| [docs/ruby.md](https://github.com/pooza/ginseng-style/blob/main/docs/ruby.md) | Ruby の書き方。暗黙の return を使わない、テストの `disable?` パターン、文字列のエンコーディング |
+| [docs/workflow.md](https://github.com/pooza/ginseng-style/blob/main/docs/workflow.md) | Issue 駆動・ブランチ・サイズラベル・リリース前レビュー・`ginseng-*` の変更手順 |
+| [docs/writing.md](https://github.com/pooza/ginseng-style/blob/main/docs/writing.md) | 表記規約。用語・パスとキーの書き方・⚠ マーカーの使い方 |
+| [docs/rationale.md](https://github.com/pooza/ginseng-style/blob/main/docs/rationale.md) | なぜ正本化したか |
+
+RuboCop の設定も同じ gem が持つ（`.rubocop.yml` は `inherit_gem` で差分だけ）。⚠ **共通に見える緩和を cure-api 側に足さないこと。** 共通化したい場合は ginseng-style に Issue を立てる。
+
+⚠ このファイルに残すのは、**cure-api 固有の事情だけ**（下記の記載先ルール・デプロイ・依存の判断など）。
+
 ## 情報の記載先ルール
 
 - **課題・タスク** → GitHub Issue で管理（インフラ面の課題は `pooza/chubo2` の Issue として起票）
