@@ -6,7 +6,7 @@ gem 'icalendar'
 gem 'puma'
 
 group :development do
-  gem 'ginseng-style', github: 'pooza/ginseng-style', branch: 'main', require: false
+  gem 'ginseng-style', github: 'pooza/ginseng-style', tag: 'v1.1.4', require: false
   gem 'ricecream'
   gem 'rack-test'
   gem 'test-unit'
