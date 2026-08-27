@@ -1,9 +1,9 @@
 GIT
   remote: https://github.com/pooza/ginseng-core.git
-  revision: 430ad064e94c3e8cea53cd1d5d8b3b4b32a723dc
+  revision: 87cd033fb39faf35bb6202c2a3cd2559c6b677eb
   branch: main
   specs:
-    ginseng-core (1.22.0)
+    ginseng-core (1.23.0)
       activesupport (>= 7.0.7.1)
       addressable (>= 2.9.0)
       cgi (>= 0.4.2)
@@ -138,7 +138,7 @@ GEM
       net-protocol
     net-pop (0.1.2)
       net-protocol
-    net-protocol (0.2.2)
+    net-protocol (0.3.0)
       timeout
     net-smtp (0.5.1)
       net-protocol
