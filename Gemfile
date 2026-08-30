@@ -6,11 +6,10 @@ gem 'icalendar'
 gem 'puma'
 
 group :development do
-  gem 'ginseng-style', github: 'pooza/ginseng-style', tag: 'v1.1.4', require: false
-  gem 'ricecream'
+  gem 'ginseng-style', github: 'pooza/ginseng-style', tag: 'v1.1.11', require: false
   gem 'rack-test'
+  gem 'ricecream'
   gem 'test-unit'
   gem 'timecop'
   gem 'webmock'
 end
-
