@@ -45,7 +45,7 @@ GIT
 
 GIT
   remote: https://github.com/pooza/ginseng-web.git
-  revision: 3484e4eaf7d385a6a3d93efb5af3b8f300656164
+  revision: 2f4fd0e68fe24fe56914648b5d3a967791f99309
   branch: main
   specs:
     ginseng-web (2.0.0)
