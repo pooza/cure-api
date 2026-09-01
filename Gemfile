@@ -6,7 +6,9 @@ gem 'icalendar'
 gem 'puma'
 
 group :development do
-  gem 'ginseng-style', github: 'pooza/ginseng-style', tag: 'v1.1.12', require: false
+  # ⚠⚠ タグではなく SHA で固定する（pooza/ginseng-style#75）。タグは付け替えられる。
+  gem 'ginseng-style', github: 'pooza/ginseng-style',
+    ref: 'ed862dcf9550d704ee670f65a30a333a694b883a', require: false # v1.1.12
   gem 'rack-test'
   gem 'ricecream'
   gem 'test-unit'
