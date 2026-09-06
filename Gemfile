@@ -19,7 +19,12 @@ gem 'puma'
 # （pooza/mulukhiya-toot-proxy#4663 の 3. と同じ切り分け）。
 gem 'rack', '>= 3.2.5' # 2026-02 の同時アクセステスト (500 req × 2 並列・不整合 0) が通った版
 gem 'rack-session', '>= 2.1.1' # CVE-2025-46336
-gem 'sinatra', '>= 4.2.1' # 🔴 4.2.0 は事故版。CVE-2024-21510 の床 4.1.0 も含む
+# 🔴 require: 'sinatra/base' を外さない。ginseng-core の Bundler.require が
+# 素の `sinatra` を読むと、クラシックモード（トップレベルの Sinatra::Delegator と
+# at_exit のランナー）が入る。⚠⚠ 実測（2026-09-06）: この宣言を require 無しにすると
+# bin/cure.rb などの経路で main が get / set に応答するようになる（develop では false）。
+# ⚠ アプリは app/lib/cure_api.rb で sinatra/base だけを読むモジュラー構成。
+gem 'sinatra', '>= 4.2.1', require: 'sinatra/base' # 🔴 4.2.0 は事故版。CVE-2024-21510 の床 4.1.0 も含む
 gem 'tilt', '>= 2.1.0'
 
 group :development do
