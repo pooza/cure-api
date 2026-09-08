@@ -1,7 +1,14 @@
 source 'https://rubygems.org'
 ruby '~>4.0.1'
-gem 'ginseng-core', github: 'pooza/ginseng-core', require: 'ginseng', branch: 'main'
-gem 'ginseng-web', github: 'pooza/ginseng-web', branch: 'main'
+# ⚠⚠ 版で固定する。`branch: 'main'` だと、向こうの main にマージされた瞬間が露出になり、
+# 破壊的変更が**次の `bundle update`（＝無関係な PR の中）**で出る（pooza/ginseng-style#103）。
+# ⚠ 版を上げるのは dependabot の PR。**この固定は「いま lock にある版を書き写しただけ」**で、
+#   ginseng-core の revision は 1 ビットも動いていない。
+gem 'ginseng-core', github: 'pooza/ginseng-core', require: 'ginseng', tag: 'v1.23.7'
+# ⚠ v2.0.0 と、いま刺さっている revision (2f4fd0e) の**配布物は完全に同一**
+#   （差分は .github/ と向こう自身の Gemfile だけ）。⚠⚠ v3.0.0 は破壊的変更なので
+#   ここでは上げない（pooza/ginseng-web#127。上の rack / sinatra などの宣言がその前提）。
+gem 'ginseng-web', github: 'pooza/ginseng-web', tag: 'v2.0.0'
 gem 'icalendar'
 gem 'puma'
 # ⚠⚠ rack / rack-session / sinatra / tilt は ginseng-web が使っていないのに宣言していた
