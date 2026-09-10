@@ -2,8 +2,10 @@ source 'https://rubygems.org'
 ruby '~>4.0.1'
 # ⚠⚠ 版で固定する。`branch: 'main'` だと、向こうの main にマージされた瞬間が露出になり、
 # 破壊的変更が**次の `bundle update`（＝無関係な PR の中）**で出る（pooza/ginseng-style#103）。
-# ⚠ 版を上げるのは dependabot の PR。**この固定は「いま lock にある版を書き写しただけ」**で、
-#   ginseng-core の revision は 1 ビットも動いていない。
+# 🔴 版は手で上げる（`tag:` を書き換えて `bundle update ginseng-core ginseng-web`）。
+#   ⚠⚠ dependabot は `versioning-strategy: lockfile-only` なので Gemfile の `tag:` を
+#   書き換えられず、版上げの PR は来ない（→ .github/dependabot.yml）。
+# ⚠ この固定は「いま lock にある版を書き写しただけ」で、ginseng-core の revision は動いていない。
 gem 'ginseng-core', github: 'pooza/ginseng-core', require: 'ginseng', tag: 'v1.23.7'
 # ⚠ v2.0.0 と、いま刺さっている revision (2f4fd0e) の**配布物は完全に同一**
 #   （差分は .github/ と向こう自身の Gemfile だけ）。⚠⚠ v3.0.0 は破壊的変更なので
