@@ -1,6 +1,8 @@
 require 'bundler/setup'
 require 'json'
 require 'webmock'
+$LOAD_PATH.unshift(File.join(File.expand_path('../..', __dir__), 'app/lib'))
+require 'cure_api'
 
 module CureAPI
   # 🔴 **GAS への実通信を遮断し、fixture を返す**（#326）。
@@ -15,6 +17,10 @@ module CureAPI
   # ⚠⚠ **`bin/cure.rb` を子プロセスで叩くテスト（`CureCommandTest`）にも効かせるため、
   # `RUBYOPT` の `-r` で単独でも読めるようにしてある**（→ `ENV_KEY`）。
   #
+  # 🔴 **差し替えるのは設定にある GAS の URL だけ**（PR #369 の Codex の P2）。⚠⚠ **`action=girls` を
+  # 持つ URL を全部差し替えると、設定の URL を打ち間違えてもテストが通る**（本番でだけ落ちる）。
+  # ⚠ そのため子プロセスでも `cure_api` を読んで、設定から URL を引く。
+  #
   # ⚠ **fixture は実データの写し**（2026-09-29 に GAS から取得）。スプレッドシートは人手で
   # 更新されるので放っておくとずれる — ⚠ **形がずれていないかは `rake test:integration` が
   # 実通信で見る**（CI の既定からは外してある）。
@@ -27,7 +33,7 @@ module CureAPI
       WebMock.enable!
       WebMock.disable_net_connect!
       ACTIONS.each do |action|
-        WebMock::API.stub_request(:get, /[?&]action=#{action}(&|\z)/)
+        WebMock::API.stub_request(:get, url(action))
           .to_return(body: File.read(path(action)), headers: {'Content-Type' => 'application/json'})
       end
     end
@@ -36,6 +42,10 @@ module CureAPI
       WebMock.reset!
       WebMock.allow_net_connect!
       WebMock.disable!
+    end
+
+    def self.url(action)
+      return "#{CureAPI::Config.instance["/gas/#{action}/url"]}?action=#{action}"
     end
 
     def self.path(action)
