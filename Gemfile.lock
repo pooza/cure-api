@@ -92,7 +92,7 @@ GEM
     drb (2.2.3)
     erb (6.0.7)
     etc (1.4.6)
-    facets (3.2.2)
+    facets (4.0.0)
     ffi (1.17.4)
     ffi (1.17.4-arm64-darwin)
     ffi (1.17.4-x86_64-linux-gnu)
