@@ -1,9 +1,9 @@
 require 'webmock'
 
 module CureAPI
-  # ⚠⚠ **このテストは GAS へ実通信しない。**既存のテスト（girls / series / cast）は
-  # ライブの GAS を叩いており、**同じコードで結果が割れる**（2026-08-13 に 4 回中 1 回
-  # だけ 404 で赤くなった → #326）。新しく足す口では最初から遮断しておく。
+  # ⚠⚠ **このテストは GAS へ実通信しない。**✅ #326 で全テストが遮断されるようになった
+  # （`TestCase` → `test/fixtures/gas_stub.rb`）が、**歌手は fixture を持たず、ここで自前の
+  # 3 件を返す**（後から登録した stub が勝つ）。
   #
   # ⚠ `require 'webmock'` だけでは HTTP アダプタは差し替わらない。**`WebMock.enable!` を
   # 呼ぶまで `stub_request` も `disable_net_connect!` も無言で素通りする。**
