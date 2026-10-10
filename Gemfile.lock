@@ -92,14 +92,14 @@ GEM
     drb (2.2.3)
     erb (6.0.7)
     etc (1.4.6)
-    facets (3.2.2)
+    facets (4.0.0)
     ffi (1.17.4)
     ffi (1.17.4-arm64-darwin)
     ffi (1.17.4-x86_64-linux-gnu)
     fileutils (1.7.3)
     find (0.2.0)
     hashdiff (1.2.1)
-    httparty (0.24.2)
+    httparty (0.24.3)
       csv
       mini_mime (>= 1.0.0)
       multi_xml (>= 0.5.2)
@@ -112,7 +112,7 @@ GEM
       ostruct
     ice_cube (0.17.0)
     json (3.0.2)
-    json-schema (6.2.0)
+    json-schema (6.2.1)
       addressable (~> 2.8)
       bigdecimal (>= 3.1, < 5)
     language_server-protocol (3.17.0.6)
@@ -140,7 +140,7 @@ GEM
       net-protocol
     net-protocol (0.4.0)
       timeout
-    net-smtp (0.5.1)
+    net-smtp (0.5.2)
       net-protocol
     nio4r (2.7.5)
     nokogiri (1.19.4)
