@@ -62,7 +62,7 @@ module CureAPI
     updated = File.read(config_path).lines.map do |line|
       in_section = true if line.match?(/^\s+#{name}:/)
       if in_section && line.match?(/^\s+\w+:/) &&
-         !line.match?(/^\s+#{name}:/) && !line.match?(/^\s+url:/)
+          !line.match?(/^\s+#{name}:/) && !line.match?(/^\s+url:/)
         in_section = false
       end
       next line unless in_section && line.match?(/^\s+url:/)

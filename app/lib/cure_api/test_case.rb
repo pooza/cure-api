@@ -4,6 +4,33 @@ module CureAPI
   class TestCase < Ginseng::TestCase
     include Package
 
+    # 🔴 **GAS を叩かない**（#326 → `test/fixtures/gas_stub.rb`）。⚠ **各テストの `setup` より前**に
+    # 差し込むので、**テストが自分で `stub_request` した URL はそちらが勝つ**（後から登録したほうが当たる）。
+    setup :stub_gas, before: :prepend
+    teardown :unstub_gas, after: :append
+
+    def self.gas_stub_path
+      return File.join(dir, 'fixtures/gas_stub.rb')
+    end
+
+    def stub_gas
+      require self.class.gas_stub_path
+      GasStub.enable!
+      reset_datasource
+    end
+
+    def unstub_gas
+      GasStub.disable!
+      reset_datasource
+    end
+
+    # ⚠ `Datasource` はシングルトンでキャッシュを持つ。テスト間で持ち越さない。
+    def reset_datasource
+      [:@girls, :@series, :@singers].each do |name|
+        Datasource.instance.instance_variable_set(name, nil)
+      end
+    end
+
     def teardown
       config.reload
       @handler&.clear

@@ -77,7 +77,13 @@ module CureAPI
     private
 
     def exec_command(*args)
-      output = `ruby #{@bin} #{args.join(' ')} 2>&1`
+      # 🔴 **子プロセスにも GAS の遮断を効かせる**（#326）。⚠ **親の `WebMock` は子に届かない**ので、
+      # `RUBYOPT` の `-r` で同じ差し替えを読ませる（→ `GasStub::ENV_KEY`）。
+      env = {
+        GasStub::ENV_KEY => '1',
+        'RUBYOPT' => [ENV.fetch('RUBYOPT', nil), "-r#{TestCase.gas_stub_path}"].compact.join(' '),
+      }
+      output = IO.popen(env, ['ruby', @bin, *args], err: [:child, :out], &:read)
 
       assert_predicate($CHILD_STATUS, :success?, "bin/cure.rb #{args.join(' ')} failed: #{output}")
       return output
