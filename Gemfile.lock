@@ -105,11 +105,10 @@ GEM
       multi_xml (>= 0.5.2)
     i18n (1.15.2)
       concurrent-ruby (~> 1.0)
-    icalendar (2.12.5)
+    icalendar (2.13.0)
       base64
       ice_cube (~> 0.16)
       logger
-      ostruct
     ice_cube (0.17.0)
     json (3.0.2)
     json-schema (6.2.1)
@@ -151,7 +150,6 @@ GEM
     nokogiri (1.19.4-x86_64-linux-gnu)
       racc (~> 1.4)
     optparse (0.8.1)
-    ostruct (0.6.3)
     parallel (2.1.0)
     parser (3.3.12.0)
       ast (~> 2.4.1)
