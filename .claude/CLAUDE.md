@@ -137,6 +137,7 @@ config/
   application.yaml # メイン設定（GAS URL、Puma ポート等）
   sample/          # rc.d / systemd / nginx / monit サンプル
 gas/
+  dic/             # GAS ソース (clasp 管理)。旧 MAKOTO の語彙。cure-api 本体は読まない
   girls/           # GAS ソース (clasp 管理)
   series/          # GAS ソース (clasp 管理)
   singers/         # GAS ソース (clasp 管理)

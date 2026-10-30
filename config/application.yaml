@@ -13,6 +13,10 @@ gas:
   # プリキュア歌手辞書。⚠ 未デプロイの間は REPLACE_ME のまま
   # （Datasource が「GAS が未デプロイ」と言って落ちる）。
   # デプロイ手順は docs/datasource-design.md
+  # 旧 MAKOTO の語彙（precure.ml/api/dic/v1/{dic,pron}.json の元）。cure-api は読まない。
+  # ⚠ `rake clasp:dic:deploy` が同じデプロイを更新するために要る。消すと URL が変わる。
+  dic:
+    url: https://script.google.com/macros/s/AKfycbxtvmWF3SorOsucrqLkeldzIepfqRAdIedQMB-kXabnYDcrGoecqr8u2iGI61xieu-j0A/exec
   singers:
     url: https://script.google.com/macros/s/AKfycbyIAUFf0BqmO2xAMQYCC-hZf4Nn8uxgjcqv41xvkv08GPBINbg3Iysc-PoKe9MHKdN4/exec
   series:
