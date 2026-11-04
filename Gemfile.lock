@@ -1,7 +1,7 @@
 GIT
   remote: https://github.com/pooza/ginseng-core.git
   revision: d1878f777ff508a9acb0be30e9a091e41b0c52ba
-  branch: main
+  ref: d1878f777ff508a9acb0be30e9a091e41b0c52ba
   specs:
     ginseng-core (1.16.3)
       activesupport (>= 7.0.7.1)
@@ -35,7 +35,7 @@ GIT
 GIT
   remote: https://github.com/pooza/ginseng-web.git
   revision: 7f0afdc237786e96e7f847e052bb76246a317bf2
-  branch: main
+  ref: 7f0afdc237786e96e7f847e052bb76246a317bf2
   specs:
     ginseng-web (1.3.46)
       erb
