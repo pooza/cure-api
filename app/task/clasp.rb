@@ -24,7 +24,7 @@ module CureAPI
   end
 
   namespace :clasp do
-    ['girls', 'series', 'singers'].each do |name|
+    ['dic', 'girls', 'series', 'singers'].each do |name|
       namespace name do
         gas_dir = File.join(dir, 'gas', name)
 
