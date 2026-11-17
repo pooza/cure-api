@@ -123,6 +123,11 @@ sudo service cure_api_puma restart   # gomander
 |---|---|
 | `name` | 歌手・グループ名 (例: 宮本 佳那子) |
 | `members` | グループの構成員 (カンマ区切り。ソロ名義は空) |
+| `nickname_unofficial` | ファンが使うあだ名 (カンマ区切り・空欄可・#399)。応答では `nicknames`。名前は girls の列にそろえた |
+
+⚠ **あだ名でも 1 人を引ける**（`/singers/くどまゆ` → 工藤 真由）。🔴 **2 人以上に当たるあだ名では引かない**（取り違えるより 404）。
+⚠ **ユニット名は名義の行として持つ**（あやかな・やえかな。`members` が構成員）。市販の盤に曲が無い名義でもよい — 「呼ばれたら誰のことか分かる」のが役目。
+⚠ **連載名や推測の呼び名は入れない**（#399 の「ちは」「ももかな」）。裏付けが出たら足す。
 
 ⚠ **`key` 列を持たない。**識別子は `name` そのもの（人名に機械的なキーを振る意味が薄く、スプレッドシートの列を増やすことになるため）。
 
@@ -142,7 +147,7 @@ sudo service cure_api_puma restart   # gomander
 
 ### singers (`gas/singers/`)
 
-- `?action=singers`（既定） — 全歌手データ (JSON配列、`name` と `members`)
+- `?action=singers`（既定） — 全歌手データ (JSON配列、`name` と `members` と `nicknames`)
 - `?action=index` — 歌手名の配列
 
 ## 新しいスプレッドシートを足すとき
@@ -156,6 +161,8 @@ sudo service cure_api_puma restart   # gomander
    - ⚠ deploy タスクが `config/application.yaml` の `/gas/{name}/url` を自動で書き換える
 5. `app/task/clasp.rb` の対象リストに `{name}` を足す
 6. `Datasource#fetch_{name}` / `{Name}Tool` / `Controller` のルート / `config` の `tools` を足す
+
+⚠⚠ **clasp の認証（`~/.clasprc.json`）は Google Workspace の再認証の設定で定期的に切れる。**切れると push が `invalid_grant` / `invalid_rapt` で落ちる。`npx -y @google/clasp@3 login` で取り直す（ブラウザで許可する一回だけ人の手が要る・無人化はできない）。🔴 **許可するのはスプレッドシートを持っているアカウント。**ブラウザでログイン中の別アカウントが選ばれやすく、違うと push が `Insufficient Permission` で落ちる（2026-11-18 に踏んだ）。認証画面の URL に `&prompt=select_account` を足すと、アカウントを選ぶ画面から始まる。
 
 ⚠ **デプロイのアクセス設定は `ANYONE_ANONYMOUS`**（`appsscript.json`）。cure-api は認証を持たない公開 API なので、GAS 側も匿名アクセスで揃える。
 

@@ -61,6 +61,9 @@ function singersResponse() {
     return {
       name: String(record.name).trim(),
       members: splitList(record.members),
+      // ファンが使うあだ名（`nickname_unofficial` 列・空欄可・#399）。⚠ 名前は girls の列にそろえ、
+      // 応答では複数形にする（配列なので）。
+      nicknames: splitList(record.nickname_unofficial),
     }
   }))
 }
