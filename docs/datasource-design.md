@@ -162,6 +162,8 @@ sudo service cure_api_puma restart   # gomander
 5. `app/task/clasp.rb` の対象リストに `{name}` を足す
 6. `Datasource#fetch_{name}` / `{Name}Tool` / `Controller` のルート / `config` の `tools` を足す
 
+⚠⚠ **clasp の認証（`~/.clasprc.json`）は Google Workspace の再認証の設定で定期的に切れる。**切れると push が `invalid_grant` / `invalid_rapt` で落ちる。`npx -y @google/clasp@3 login` で取り直す（ブラウザで許可する一回だけ人の手が要る・無人化はできない）。🔴 **許可するのはスプレッドシートを持っているアカウント。**ブラウザでログイン中の別アカウントが選ばれやすく、違うと push が `Insufficient Permission` で落ちる（2026-11-18 に踏んだ）。認証画面の URL に `&prompt=select_account` を足すと、アカウントを選ぶ画面から始まる。
+
 ⚠ **デプロイのアクセス設定は `ANYONE_ANONYMOUS`**（`appsscript.json`）。cure-api は認証を持たない公開 API なので、GAS 側も匿名アクセスで揃える。
 
 ## Ruby側の構成
