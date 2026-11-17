@@ -123,6 +123,11 @@ sudo service cure_api_puma restart   # gomander
 |---|---|
 | `name` | 歌手・グループ名 (例: 宮本 佳那子) |
 | `members` | グループの構成員 (カンマ区切り。ソロ名義は空) |
+| `nickname_unofficial` | ファンが使うあだ名 (カンマ区切り・空欄可・#399)。応答では `nicknames`。名前は girls の列にそろえた |
+
+⚠ **あだ名でも 1 人を引ける**（`/singers/くどまゆ` → 工藤 真由）。🔴 **2 人以上に当たるあだ名では引かない**（取り違えるより 404）。
+⚠ **ユニット名は名義の行として持つ**（あやかな・やえかな。`members` が構成員）。市販の盤に曲が無い名義でもよい — 「呼ばれたら誰のことか分かる」のが役目。
+⚠ **連載名や推測の呼び名は入れない**（#399 の「ちは」「ももかな」）。裏付けが出たら足す。
 
 ⚠ **`key` 列を持たない。**識別子は `name` そのもの（人名に機械的なキーを振る意味が薄く、スプレッドシートの列を増やすことになるため）。
 
@@ -142,7 +147,7 @@ sudo service cure_api_puma restart   # gomander
 
 ### singers (`gas/singers/`)
 
-- `?action=singers`（既定） — 全歌手データ (JSON配列、`name` と `members`)
+- `?action=singers`（既定） — 全歌手データ (JSON配列、`name` と `members` と `nicknames`)
 - `?action=index` — 歌手名の配列
 
 ## 新しいスプレッドシートを足すとき

@@ -4,6 +4,9 @@ module CureAPI
   # ⚠ **グループは `members` に構成員を持つ**（キュア・レインボーズ = 五條真由美,
   # うちやえゆか, …）。ソロ名義は空配列。
   #
+  # `nicknames` はファンが使うあだ名（#399・空配列もある）。⚠ **あだ名でも 1 人を引ける**
+  # （`/singers/くどまゆ` → 工藤 真由）。
+  #
   # 利用側の例: `pooza/makoto2` のバースデーライブ（#13）は、⚠ **ゲストコーナーで
   # 出すカバーを「プリキュア歌手の持ち歌」に限る**ためにこれを引く。カラオケレーベル
   # （歌っちゃ王）やオルゴール盤が混ざるのを、名義の側で落とす。
@@ -39,6 +42,7 @@ module CureAPI
         'bin/cure.rb singers index - すべてのプリキュア歌手の名前 (JSON)',
         'bin/cure.rb singers :name - 指定した歌手 (JSON)',
         '  ex) bin/cure.rb singers 宮本佳那子 # 姓名の間の空白は有無どちらでも引ける',
+        '  ex) bin/cure.rb singers くどまゆ # あだ名でも引ける',
       ]
     end
   end

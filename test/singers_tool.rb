@@ -13,8 +13,8 @@ module CureAPI
     URL = 'https://script.google.test/macros/s/singers/exec'.freeze
 
     RECORDS = [
-      {'name' => '宮本 佳那子', 'members' => []},
-      {'name' => '五條 真由美', 'members' => []},
+      {'name' => '宮本 佳那子', 'members' => [], 'nicknames' => ['かなちゃん', 'かなちょ', 'ちゃん']},
+      {'name' => '五條 真由美', 'members' => [], 'nicknames' => ['まいこ', 'ちゃん']},
       {'name' => 'キュア・レインボーズ',
        'members' => ['五條真由美', 'うちやえゆか', '工藤真由', '宮本佳那子']},
     ].freeze
@@ -67,6 +67,25 @@ module CureAPI
       ['宮本 佳那子', '宮本佳那子', '宮本　佳那子'].each do |name|
         assert_equal('宮本 佳那子', @tool.exec(['singers', name])[:name], "'#{name}' で引けない")
       end
+    end
+
+    # ⚠ あだ名でも引ける（#399・名前から推せない「まいこ」が本命）。
+    def test_lookup_by_nickname
+      assert_equal('五條 真由美', @tool.exec(['singers', 'まいこ'])[:name])
+      assert_equal('宮本 佳那子', @tool.exec(['singers', 'かなちょ'])[:name])
+      assert_equal(['かなちゃん', 'かなちょ', 'ちゃん'], @tool.exec(['singers', '宮本佳那子'])[:nicknames])
+    end
+
+    # 🔴 **2 人以上に当たるあだ名では引かない**（取り違えるより無いと言う）。
+    def test_ambiguous_nickname_is_not_found
+      assert_raise Ginseng::NotFoundError do
+        @tool.exec(['singers', 'ちゃん'])
+      end
+    end
+
+    # ⚠ 古い GAS は `nicknames` を返さない。空配列にそろえる。
+    def test_missing_nicknames_become_empty
+      assert_empty(@tool.exec(['singers', 'キュア・レインボーズ'])[:nicknames])
     end
 
     def test_unknown_name_raises

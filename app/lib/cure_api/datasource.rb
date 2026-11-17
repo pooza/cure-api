@@ -34,10 +34,19 @@ module CureAPI
     # 姓名の間に空白を持つが、⚠ **iTunes 由来の曲データの名義は「宮本佳那子」**。
     # 空白の有無で引けなくなると、利用側（`pooza/makoto2` のカバー選曲）が
     # **静かに 1 件も一致しない**形で壊れる。
+    #
+    # ⚠ **名前で当たらなければ、あだ名（`nicknames`）で引く**（#399・「くどまゆ」→ 工藤 真由）。
+    # 🔴 **あだ名が 2 人以上に当たったら引かない。**取り違えて別の人を返すより、無いと言うほうが安全。
     def find_singer(name)
       key = self.class.normalize_name(name)
       return nil if key.empty?
-      singers.find {|s| self.class.normalize_name(s[:name]) == key}
+      if (singer = singers.find {|s| self.class.normalize_name(s[:name]) == key})
+        return singer
+      end
+      matches = singers.select do |s|
+        s[:nicknames].any? {|nickname| self.class.normalize_name(nickname) == key}
+      end
+      return matches.one? ? matches.first : nil
     end
 
     # ⚠ 全角・半角と空白を落とすだけ。**表記の同一性の判定はここが唯一の正本**に
@@ -76,6 +85,8 @@ module CureAPI
       @http.get("#{url}?action=singers").map do |record|
         h = record.transform_keys(&:to_sym)
         h[:members] = Array(h[:members])
+        # ⚠ 古い GAS（列を足す前のデプロイ）は `nicknames` を返さない。空配列にそろえる。
+        h[:nicknames] = Array(h[:nicknames])
         h
       end
     end
