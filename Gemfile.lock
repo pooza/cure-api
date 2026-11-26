@@ -110,7 +110,7 @@ GEM
       ice_cube (~> 0.16)
       logger
     ice_cube (0.17.0)
-    json (3.1.0)
+    json (3.2.0)
     json-schema (6.2.1)
       addressable (~> 2.8)
       bigdecimal (>= 3.1, < 5)
