@@ -37,6 +37,9 @@ module CureAPI
       Timecop.return
     end
 
+    # ginseng-upstream: pooza/ginseng-style#132 — 上流は ginseng-core v4.3.0 で直った（字面の
+    # `Package` / `Environment` が core のものに解決され、写すしかなかった）。⚠ いまの lock は
+    # v1.23.7 なので残す。v4.3.0 以上へ上げたら消す（#388・#339）。
     def self.load(cases = nil)
       ENV['TEST'] = Package.full_name
       names(cases).each do |name|
@@ -48,6 +51,7 @@ module CureAPI
       end
     end
 
+    # ginseng-upstream: pooza/ginseng-style#132 — load と同じ（#388 で消す）
     def self.names(cases = nil)
       if cases
         names = cases.split(',')
@@ -59,6 +63,7 @@ module CureAPI
       return names.to_set
     end
 
+    # ginseng-upstream: pooza/ginseng-style#132 — load と同じ（#388 で消す）
     def self.dir
       return File.join(Environment.dir, 'test')
     end
